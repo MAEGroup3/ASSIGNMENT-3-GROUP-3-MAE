@@ -1,0 +1,179 @@
+% Create structural array leaves(1 to 7)
+leaf(1).name='maize';
+leaf(1).scientificname='zea mays';
+leaf(1).type='simple';
+leaf(1).shape='linear/long and narrow';
+leaf(1).venation='parallel';
+leaf(1).margin='entire';
+leaf(1).arrangement='alternate';
+leaf(1).lamina='rough and narrow';
+leaf(1).apex='pointed/sharp';
+
+leaf(2).name='bean';
+leaf(2).scientificname='phaseolus vulgaris';
+leaf(2).type='compound-trifoliate';
+leaf(2).shape='ovate';
+leaf(2).venation='reticulate';
+leaf(2).margin='entire';
+leaf(2).arrangement='alternate';
+leaf(2).lamina='broad and narrow';
+leaf(2).apex='acute';
+
+leaf(3).name='fern';
+leaf(3).scientificname='Nephrolepis exaltata';
+leaf(3).type='compound-pinnate(frond)';
+leaf(3).shape='lanceolate leaflets';
+leaf(3).venation='open furcate';
+leaf(3).margin='serrate/crenate';
+leaf(3).arrangement='clustered and spiral';
+leaf(3).lamina='smooth';
+leaf(3).apex='acute';
+
+leaf(4).name='guava';
+leaf(4).scientificname='psisium guajava';
+leaf(4).type='simple';
+leaf(4).shape='elliptical and oblong';
+leaf(4).venation='reticulate';
+leaf(4).margin='entire';
+leaf(4).arrangement='opposite';
+leaf(4).lamina='rough and broad';
+leaf(4).apex='obtuse';
+
+leaf(5).name='pawpaw';
+leaf(5).scientificname='carica papaya';
+leaf(5).type='simple-deeply lobed';
+leaf(5).shape='palmate';
+leaf(5).venation='reticulate';
+leaf(5).margin='lobed';
+leaf(5).arrangement='spiral or alternate';
+leaf(5).lamina='rough';
+leaf(5).apex='acute';
+
+leaf(6).name='mango';
+leaf(6).scientificname='mangifera indica';
+leaf(6).type='simple';
+leaf(6).shape='lanceolate';
+leaf(6).venation='reticulate';
+leaf(6).margin='entire';
+leaf(6).arrangement='alternate';
+leaf(6).lamina='smooth and narrow';
+leaf(6).apex='acute';
+
+leaf(7).name='black jack';
+leaf(7).scientificname='bidens pilosa';
+leaf(7).type='compound-pinnate';
+leaf(7).shape='ovate to lanceolate leaflets';
+leaf(7).venation='reticulate';
+leaf(7).margin='serrate';
+leaf(7).arrangement='opposite';
+leaf(7).lamina='rough';
+leaf(7).apex='acuminate to acute';
+
+% Display as table
+T = struct2table(leaf);
+disp(T);
+
+%import and display all images
+folder = 'C:\Users\hp\OneDrive\Documents\MATLAB\leaves';
+ds = imageDatastore(folder, 'FileExtensions','.JPG');
+
+fprintf('Found %d images\7', 7);
+figure
+for i=1:7
+    img=readimage(ds,i);
+    subplot(3,3,i); 
+    imshow(img)
+end
+
+%import separate images
+I1=imread('C:\Users\hp\OneDrive\Documents\MATLAB\leaves\leaf 1.jpg');
+figure; imshow(I1);
+
+I2=imread('C:\Users\hp\OneDrive\Documents\MATLAB\leaves\leaf 2.jpg');
+figure; imshow(I2);
+
+I3=imread('C:\Users\hp\OneDrive\Documents\MATLAB\leaves\leaf 3.jpg');
+figure; imshow(I3);
+
+I4=imread('C:\Users\hp\OneDrive\Documents\MATLAB\leaves\leaf 4.jpg');
+figure; imshow(I4);
+
+I5=imread('C:\Users\hp\OneDrive\Documents\MATLAB\leaves\leaf 5.jpg');
+figure; imshow(I5);
+
+I6=imread('C:\Users\hp\OneDrive\Documents\MATLAB\leaves\leaf 6.jpg');
+figure; imshow(I6);
+
+I7=imread('C:\Users\hp\OneDrive\Documents\MATLAB\leaves\leaf 7.jpg');
+figure; imshow(I7);
+
+%Size of the images
+sz=size(img)
+
+I=img(:,:,2);
+imshow(I)
+
+%find the largest value in images
+Imax=max(img,[],"all")
+
+%find the smallest value 
+Imin=min(img,[],"all")
+
+%to brighten the image
+imlocalbrighten(I7);
+imshow(I7)
+
+%conversion to grayscale
+figure
+gs1=im2gray(I1);
+gs7=im2gray(I7);
+imshowpair(gs1,gs7,"montage")
+
+figure
+gs3=im2gray(I3);
+gs5=im2gray(I5);
+imshowpair(gs3,gs5,"montage")
+
+figure
+gs2=im2gray(I2);
+gs6=im2gray(I6);
+gs4=im2gray(I4);
+imgList={gs2,gs6,gs4};
+montage(imgList)
+
+%Contrast adjustment
+figure
+Adj5=imadjust(gs5);
+imhist(I5)
+
+%imbinarize
+imgsbin = {I1,I2,I3,I4,I5,I6,I7};
+for i = 1:7
+    BW = imbinarize(rgb2gray(imgsbin{i}));
+    figure;
+    imshow(BW);
+end
+
+%Resizing and removing noise from the images
+imgs = {I1,I2,I3,I4,I5,I6,I7};
+final = cell(1,7);
+for i = 1:7
+    r = imresize(imgs{i}, [256 256]);
+    g = rgb2gray(r);
+    final{i} = medfilt2(g, [3 3]);
+end
+
+% Display results
+for i = 1:7
+    figure;
+    subplot(1,2,1); imshow(imresize(rgb2gray(imgs{i}), [256 256]));
+    title('Resized images');
+    subplot(1,2,2); imshow(final{i}); title('Resized and Denoised');
+end
+figure;
+montage(final, 'Size', [1 7]);
+title('Final Denoised Montage');
+
+%Closing an image
+imclose(gs)
+
